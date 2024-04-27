@@ -33,7 +33,7 @@ pip install -r requirements.txt
 To start TidyCobra, run:
 
 ```bash
-python TidyCobra.py
+python TidyCobra.pyw
 ```
 
 Follow the GUI prompts to configure your sorting rules.
