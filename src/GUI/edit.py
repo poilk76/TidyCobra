@@ -3,6 +3,7 @@ import wx.dataview
 from pubsub import pub
 from src.functions.config import CONFIGURATIONRULE, saveConfig
 from src.GUI.add import ADDWINDOW
+from src.functions.locale import getLocale
 import os
 
 class EDITWINDOWS(wx.Frame):
@@ -23,23 +24,23 @@ class EDITWINDOWS(wx.Frame):
     def addListener(self,path:str, extensions:str) -> None:
         self.view.AppendItem([path,extensions])
         self.Show()
-        self.SetStatusText(f"Set move rule for {path}.")
+        self.SetStatusText(self.locale["SETRULE"]+f"{path}.")
 
     def addFunc(self, *args) -> None:
         ADDWINDOW()
 
     def removeFunc(self, *args) -> None:
         if self.view.GetSelectedRow() != -1:
-            self.SetStatusText(f'Removed {self.view.GetSelectedRow()}.')
+            self.SetStatusText(self.locale["DONEREMOVE"]+f'{self.view.GetSelectedRow()}.')
             self.view.DeleteItem(self.view.GetSelectedRow())
         else:
-            self.SetStatusText(f'Not selected row.')
+            self.SetStatusText(self.locale["STOPREMOVE"])
 
     def browseFunc(self, *args) -> None:
         dlg = wx.DirDialog(self, "Choose a directory:", style=wx.DD_DEFAULT_STYLE)
         if dlg.ShowModal() == wx.ID_OK:
             self.pathTextBox.SetValue(dlg.GetPath())
-            self.SetStatusText(f"Set {dlg.GetPath()} to text box.")
+            self.SetStatusText(self.locale["SETTEXTBOX"][0]+dlg.GetPath()+self.locale["SETTEXTBOX"][1])
         dlg.Destroy()
 
     def closeFunc(self, *args) -> None:
@@ -56,10 +57,10 @@ class EDITWINDOWS(wx.Frame):
 
         horizontalSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.saveBtn = wx.Button(self.panel, label="SAVE")
+        self.saveBtn = wx.Button(self.panel, label=self.locale["SAVE"])
         self.saveBtn.Bind(wx.EVT_BUTTON, self.saveFunc)
 
-        self.closeBtn = wx.Button(self.panel, label="CANCEL")
+        self.closeBtn = wx.Button(self.panel, label=self.locale["CANCEL"])
         self.closeBtn.Bind(wx.EVT_BUTTON, self.closeFunc)
 
         horizontalSizer.AddStretchSpacer()
@@ -74,13 +75,13 @@ class EDITWINDOWS(wx.Frame):
         horizontalSizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self.view = wx.dataview.DataViewListCtrl(self.panel, size=(300, 200))
-        self.view.AppendTextColumn("Rule", width=280)
-        self.view.AppendTextColumn("Extensions")
+        self.view.AppendTextColumn(self.locale["RULE"], width=280)
+        self.view.AppendTextColumn(self.locale["EXTENSIONS"])
 
-        self.addBtn = wx.Button(self.panel, label="ADD")
+        self.addBtn = wx.Button(self.panel, label=self.locale["ADD"])
         self.addBtn.Bind(wx.EVT_BUTTON, self.addFunc)
 
-        self.removeBtn = wx.Button(self.panel, label="REMOVE")
+        self.removeBtn = wx.Button(self.panel, label=self.locale["REMOVE"])
         self.removeBtn.Bind(wx.EVT_BUTTON, self.removeFunc)
 
         horizontalSizer.Add(self.addBtn, wx.SizerFlags().Proportion(1))
@@ -92,22 +93,23 @@ class EDITWINDOWS(wx.Frame):
         return verticalSizer
 
     def __init__(self, file):
-
+    
         super().__init__(None, title="Add set of rules", style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
         self.SetMinSize((300,600))
         self.CreateStatusBar()
+        self.locale = getLocale("pl")
 
         self.mainSizer = wx.BoxSizer(wx.VERTICAL)
         self.panel = wx.Panel(self)
         
-        nameLabel = wx.StaticText(self.panel, label="Rule set name:")
+        nameLabel = wx.StaticText(self.panel, label=self.locale["SETNAME"])
         self.nameTextBox = wx.TextCtrl(self.panel, size=(-1, -1))
 
-        pathLabel = wx.StaticText(self.panel, label="Sort in path:")
+        pathLabel = wx.StaticText(self.panel, label=self.locale["SORTPATH"])
         horizontalSizer = wx.BoxSizer(wx.HORIZONTAL)
         self.pathTextBox = wx.TextCtrl(self.panel, size=(280, -1))
 
-        self.browseBtn = wx.Button(self.panel, label="BROWSE")
+        self.browseBtn = wx.Button(self.panel, label=self.locale["BROWSE"])
         self.browseBtn.Bind(wx.EVT_BUTTON, self.browseFunc)
         horizontalSizer.Add(self.pathTextBox)
         horizontalSizer.Add(self.browseBtn, flag=wx.EXPAND | wx.LEFT, border=10)
@@ -132,5 +134,5 @@ class EDITWINDOWS(wx.Frame):
 
         pub.subscribe(self.addListener, "add")
 
-        self.SetStatusText("Conf loaded.")
+        self.SetStatusText(self.locale["READY"])
         self.Show()
