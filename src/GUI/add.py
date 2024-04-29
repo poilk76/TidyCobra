@@ -70,7 +70,7 @@ class ADDWINDOW(wx.Frame):
         super().__init__(None, title="Add", style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
         self.SetMinSize((200,300))
         self.CreateStatusBar()
-        self.locale = getLocale("pl")
+        self.locale = getLocale("eng")
 
         self.panel = wx.Panel(self)
         mainSizer = wx.BoxSizer(wx.VERTICAL)

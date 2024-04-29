@@ -81,7 +81,7 @@ class MAINWINDOW(wx.Frame):
         super().__init__(None, title="Tidy Cobra", style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
         self.SetMinSize((300,600))
         self.CreateStatusBar()
-        self.locale = getLocale("pl")
+        self.locale = getLocale("eng")
 
         self.sorter = SORTER()
         self.sorter.getConfigurations()
