@@ -14,6 +14,21 @@ class CONFIGURATIONRULE:
     def __repr__(self) -> str:
         return self.data
     
+class CONFIGURATIONMAIN:
+
+    def saveConf(self):
+        with open('src/config.json', 'w') as f:
+            f.write(dumps({"lang":self.lang}))
+
+    def __init__(self) -> None:
+        with open('src/config.json', 'r') as f:
+            self.data = f.read()
+        dataDict = loads(self.data)
+        self.lang = dataDict["lang"]
+
+    def __repr__(self) -> str:
+        return self.data
+    
 def getRuleSets() -> list:
 
     paths = [rule.split('.')[0] for rule in listdir("src/rules")]

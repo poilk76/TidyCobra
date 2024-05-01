@@ -1,7 +1,7 @@
 import wx
 import wx.dataview
 from pubsub import pub
-from src.GUI import edit
+from src.GUI import edit, settings
 from src.functions.config import getRuleSets
 from src.functions.sort import SORTER
 from src.functions.locale import getLocale
@@ -16,6 +16,7 @@ class MAINWINDOW(wx.Frame):
         self.Show()
         self.dataViewReset()
         self.sorter.getConfigurations()
+        self.locale = getLocale()
         self.SetStatusText(self.locale["RELOAD"])
 
     def dataViewReset(self) -> None:
@@ -53,6 +54,11 @@ class MAINWINDOW(wx.Frame):
         else: 
             self.SetStatusText(self.locale["STOPMODIFY"])
 
+    #SETTINGS
+    def settingsFunc(self, *args) -> None:
+        settings.SETINGSWINDOW()
+        self.SetStatusText("Settings window opened")
+
     def buttons(self) -> wx.BoxSizer:
 
         horizontalSizer= wx.BoxSizer(wx.HORIZONTAL)
@@ -65,12 +71,19 @@ class MAINWINDOW(wx.Frame):
 
         self.modifyBtn = wx.Button(self.panel, label=self.locale["MODIFY"])
         self.modifyBtn.Bind(wx.EVT_BUTTON, self.modifyFunc)
-        
+
+        bitmap = wx.Bitmap("resources/settings.svg")
+        bitmap.Rescale(bitmap, (25,25))
+        self.settingsBtn = wx.Button(self.panel,size=(45,45))
+        self.settingsBtn.Bind(wx.EVT_BUTTON, self.settingsFunc)
+        self.settingsBtn.SetBitmap(bitmap)
+
         horizontalSizer.AddStretchSpacer()
 
         horizontalSizer.Add(self.addBtn ,flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.TOP, border=2)
         horizontalSizer.Add(self.deleteBtn, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.TOP, border=2)
         horizontalSizer.Add(self.modifyBtn, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.TOP, border=2)
+        horizontalSizer.Add(self.settingsBtn, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.TOP, border=2)
 
         return horizontalSizer
 
@@ -81,7 +94,7 @@ class MAINWINDOW(wx.Frame):
         super().__init__(None, title="Tidy Cobra", style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX))
         self.SetMinSize((300,600))
         self.CreateStatusBar()
-        self.locale = getLocale("eng")
+        self.locale = getLocale()
 
         self.sorter = SORTER()
         self.sorter.getConfigurations()
