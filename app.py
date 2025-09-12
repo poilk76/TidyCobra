@@ -1,15 +1,35 @@
-from os.path import expanduser
-from pathlib import Path
-import folder_paths
-from GUI import view_main
-import glob
-home_path = ""
-downloads_path = ""
+from GUI import viewMain
+from os import path
+from json import dump
+from platform import system
 
-def run():
-    print("Welcome to TidyCobra!")
-    home_path = str(Path().home())
-    downloads_path = home_path + "/Downloads"
-    print("Downloads path is:",__name__)
-    print(glob.glob("./*.txt"))
-    view_main.render_GUI()
+configFilePath: str = "./config.json"
+configTemplate: dict = {
+    "operatingSystem": system(),
+    "startup": False,
+    "rulesList": [
+        #  {
+        #      "sourceFolder": "<path to source folder>",
+        #      "destinationFolders": [
+        #           {
+        #               "extensions": [<file extensions like pdf, png, ...>],
+        #               "destinationPath": "<path where file should go>"
+        #           },
+        #           ...
+        #      ]
+        #  }, ...
+        {
+            "sourceFolder": "",
+            "destinationFolders": []
+        }
+    ]
+}
+
+if __name__ == "__main__":
+
+    if not path.isfile(configFilePath):
+
+        with open(configFilePath, 'w+') as configFile:
+            dump(configTemplate, configFile)
+    
+    viewMain.renderGui()
