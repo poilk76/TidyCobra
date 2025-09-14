@@ -1,5 +1,5 @@
 <div align="center">
-<img align="center" src="https://i.imgur.com/xIFQWXg.png">
+![logo](Resources/banner.png)
 </div>
 
 # TidyCobra
