@@ -1,5 +1,5 @@
 <div align="center">
-![logo](Resources/banner.png)
+![logo](relative%20Resources/banner.png)
 </div>
 
 # TidyCobra
