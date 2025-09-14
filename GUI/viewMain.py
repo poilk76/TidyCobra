@@ -1,12 +1,11 @@
 import wx
 import wx.dataview
 from pubsub import pub
-from Sorter.config import CONFIG
-from Sorter.sorter import SORTER
+from Sorter.config import Config
+from Sorter.sorter import Sorter
 from GUI import viewAddRule
 
 class MainWindow(wx.Frame):
-    ''' Fereastra principala '''
 
     def onBtnDownloadFolder(self, event):
 
@@ -25,7 +24,7 @@ class MainWindow(wx.Frame):
 
         selectedItem = self.dataView.GetSelectedRow()
         self.dataView.DeleteItem(selectedItem)
-        self.config.rulesList[0]["destinationFolders"].remove(selectedItem)
+        self.config.rulesList[0]["destinationFolders"].pop(selectedItem)
 
     def onBtnImportConfig(self, event):
         return -1  # not implemented
@@ -52,8 +51,8 @@ class MainWindow(wx.Frame):
         wx.Frame.__init__(self, None, title="Tidy Cobra", style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER
                                                                                            | wx.MAXIMIZE_BOX))
         
-        self.config = CONFIG()
-        self.sorter = SORTER(self.config)
+        self.config = Config()
+        self.sorter = Sorter(self.config)
 
         self.payload = []
         self.SetMinSize(self.GetSize())
@@ -130,7 +129,6 @@ class MainWindow(wx.Frame):
         self.hboxSaveControls.Add(self.btnRunAuto, wx.SizerFlags().Proportion(1).Border(wx.LEFT, 2))
         self.sizerMain.Add(self.hboxSaveControls, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, border=10)
 
-        self.panel.SetSizer(self.sizerMain)
         self.panel.SetSizer(self.sizerMain)
         self.Center()
         self.SetSize(self.GetBestSize())
