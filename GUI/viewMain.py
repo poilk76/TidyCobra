@@ -3,11 +3,11 @@ import wx.dataview
 from pubsub import pub
 from Sorter.config import Config
 from Sorter.sorter import Sorter
-from GUI import viewAddRule
+from GUI import viewModifyRule,viewRemoveConfirmation
 
 class MainWindow(wx.Frame):
 
-    def onBtnDownloadFolder(self, event):
+    def onBtnDownloadFolder(self, event) -> None:
 
         dlg = wx.DirDialog(self, "Choose a directory:", style=wx.DD_DEFAULT_STYLE)
         if dlg.ShowModal() == wx.ID_OK:
@@ -15,19 +15,24 @@ class MainWindow(wx.Frame):
             self.config.rulesList[0]["sourceFolder"] = dlg.GetPath()
         dlg.Destroy()
 
-    def onBtnAddItem(self, event):
+    def onBtnAddItem(self, event) -> None:
 
-        addRuleWindow = viewAddRule.AddRuleWindow()
+        self.dataView.AppendItem(["",""])
+        self.config.rulesList[0]["destinationFolders"].append({})
+        addRuleWindow = viewModifyRule.ModifyRuleWindow(len(self.config.rulesList[0]["destinationFolders"])-1)
         addRuleWindow.Show()
 
-    def onBtnRemoveItem(self, event):
+    def onBtnRemoveItem(self, event) -> None:
 
         selectedItem = self.dataView.GetSelectedRow()
-        self.dataView.DeleteItem(selectedItem)
-        self.config.rulesList[0]["destinationFolders"].pop(selectedItem)
+        removeRuleWindow = viewRemoveConfirmation.RemoveRule(selectedItem)
+        removeRuleWindow.Show()
 
-    def onBtnImportConfig(self, event):
-        return -1  # not implemented
+    def onBtnModifyItem(self, event) -> None:
+        
+        selectedItem = self.dataView.GetSelectedRow()
+        modifyRuleWindow = viewModifyRule.ModifyRuleWindow(selectedItem,self.config.rulesList[0]["destinationFolders"][selectedItem])
+        modifyRuleWindow.Show()
 
     def onBtnSaveConfig(self, event) -> None:
 
@@ -38,16 +43,28 @@ class MainWindow(wx.Frame):
         self.sorter.ruleList = self.config.rulesList
         self.sorter.sortAll()
 
-    def onBtnRunAuto(self, event):
-        return -1  # not implemented
+    def onClose(self,event) -> None:
+        self.config.saveConfig()
+        self.Destroy()
 
-    '''Listeners!'''
-    def listenerAddRule(self, message, arg2=None):
+    def listenerModifyRule(self, message) -> None:
+        
+        if message["id"] != -1:
+            data = message["data"]
+            self.dataView.SetValue(data["destinationPath"],message["id"],0)
+            self.dataView.SetValue(" ".join(data["extensions"]),message["id"],1)
+            self.config.rulesList[0]["destinationFolders"][message["id"]] = data
+        elif self.config.rulesList[0]["destinationFolders"][-1] == {}:
+            lastIndex = len(self.config.rulesList[0]["destinationFolders"])-1
+            self.dataView.DeleteItem(lastIndex)
+            self.config.rulesList[0]["destinationFolders"].pop(lastIndex)
+    
+    def listenerRemoveRule(self, id) -> None:
 
-        self.dataView.AppendItem([message["destinationPath"]," ".join(message["extensions"])])
-        self.config.rulesList[0]["destinationFolders"].append(message)
-
-    def __init__(self):
+        self.dataView.DeleteItem(id)
+        self.config.rulesList[0]["destinationFolders"].pop(id)
+    
+    def __init__(self) -> None:
         wx.Frame.__init__(self, None, title="Tidy Cobra", style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER
                                                                                            | wx.MAXIMIZE_BOX))
         
@@ -59,7 +76,8 @@ class MainWindow(wx.Frame):
         self.panel = wx.Panel(self)
         self.CreateStatusBar()
         self.SetStatusText("Ready!")
-        pub.subscribe(self.listenerAddRule, "addRuleListener")
+        pub.subscribe(self.listenerModifyRule, "modifyRuleListener")
+        pub.subscribe(self.listenerRemoveRule, "removeRuleListener")
 
         ''' Text labels '''
         self.textStep1 = wx.StaticText(self.panel, label="Step 1: Choose your Downloads folder")
@@ -81,14 +99,14 @@ class MainWindow(wx.Frame):
         self.btnDownloadFolder = wx.Button(self.panel, label="Browse")
         self.btnDownloadFolder.Bind(wx.EVT_BUTTON, self.onBtnDownloadFolder)
 
-        self.btnAddItem = wx.Button(self.panel, label="Add rule")
+        self.btnAddItem = wx.Button(self.panel, label="Add")
         self.btnAddItem.Bind(wx.EVT_BUTTON, self.onBtnAddItem)
 
-        self.btnRemoveItem = wx.Button(self.panel, label="Remove selected")
+        self.btnRemoveItem = wx.Button(self.panel, label="Remove")
         self.btnRemoveItem.Bind(wx.EVT_BUTTON, self.onBtnRemoveItem)
 
-        self.btnImportConfig = wx.Button(self.panel, label="Import configuration")
-        self.btnImportConfig.Bind(wx.EVT_BUTTON, self.onBtnImportConfig)
+        self.btnImportConfig = wx.Button(self.panel, label="Modify")
+        self.btnImportConfig.Bind(wx.EVT_BUTTON, self.onBtnModifyItem)
 
         self.btnSaveConfig = wx.Button(self.panel, label="Save configuration file")
         self.btnSaveConfig.Bind(wx.EVT_BUTTON, self.onBtnSaveConfig)
@@ -97,7 +115,7 @@ class MainWindow(wx.Frame):
         self.btnRunManual.Bind(wx.EVT_BUTTON, self.onBtnRunManual)
 
         self.btnRunAuto = wx.Button(self.panel, label="Run on startup")
-        self.btnRunAuto.Bind(wx.EVT_BUTTON, self.onBtnRunAuto)
+        #self.btnRunAuto.Bind(wx.EVT_BUTTON, self.onBtnRunAuto)
 
         ''' Textboxes '''
         self.textBoxDownloadFolder = wx.TextCtrl(self.panel)
@@ -135,6 +153,7 @@ class MainWindow(wx.Frame):
         self.sizerMain.Fit(self)
         self.SetMinSize(self.GetSize())
         self.SetMaxSize(self.GetSize())
+        self.Bind(wx.EVT_CLOSE, self.onClose)
         self.Center()
 
         for destinationFolder in self.config.rulesList[0]["destinationFolders"]:

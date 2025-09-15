@@ -2,7 +2,6 @@
 <img align="center" src="https://github.com/poilk76/TidyCobra/blob/master/Resources/banner.png">
 </div>
 
-# TidyCobra
 
 TidyCobra is a Python-based utility that automates the sorting of downloaded files into designated folders like Pictures, Music, Documents, etc., keeping your Downloads folder organized.
 <p>🐍 Includes configuration tool, as well as a script to be set to run on startup, in order to periodically reroute your downloaded files to their respective folders.</p>

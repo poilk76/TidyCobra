@@ -1,13 +1,21 @@
 import wx
 from pubsub import pub
 
-class AddRuleWindow(wx.Frame):
+class ModifyRuleWindow(wx.Frame):
 
     def onBtnBrowse(self, event):
         dlg = wx.DirDialog(self, "Choose a directory:", style=wx.DD_DEFAULT_STYLE)
         if dlg.ShowModal() == wx.ID_OK:
             self.textboxFolderPath.SetValue(dlg.GetPath())
         dlg.Destroy()
+
+    def onBtnCancel(self, event):
+        pub.sendMessage("modifyRuleListener", message={"id":-1})
+        self.Destroy()
+
+    def onClose(self,event) -> None:
+        pub.sendMessage("modifyRuleListener", message={"id":-1})
+        self.Destroy()
 
     def onBtnSave(self, event):
 
@@ -21,16 +29,22 @@ class AddRuleWindow(wx.Frame):
             "destinationPath": self.textboxFolderPath.GetValue()
         }
         
-        pub.sendMessage("addRuleListener", message=data)
+        pub.sendMessage("modifyRuleListener", message={
+            "id": self.id,
+            "data": data
+        })
         self.Destroy()
 
-    def __init__(self):
-        wx.Frame.__init__(self, None, title="Add rule", style=wx.DEFAULT_DIALOG_STYLE & ~wx.RESIZE_BORDER)
+    def __init__(self, id:int, baseData:dict = {"destinationPath":"","extensions":[]}) -> None:
+        wx.Frame.__init__(self, None, title="Modify rule", style=wx.DEFAULT_DIALOG_STYLE & ~wx.RESIZE_BORDER)
         self.panel = wx.Panel(self)
+
+        self.id:int = id
 
         '''Sizers'''
         self.vbox = wx.BoxSizer(wx.VERTICAL)
         self.hboxPath = wx.BoxSizer(wx.HORIZONTAL)
+        self.operationsBox = wx.BoxSizer(wx.HORIZONTAL)
 
         '''Labels'''
         self.labelFolderPath = wx.StaticText(self.panel, label="Select folder path:")
@@ -39,12 +53,16 @@ class AddRuleWindow(wx.Frame):
         '''Textboxes'''
         self.textboxFolderPath = wx.TextCtrl(self.panel, size=(300, -1))
         self.textboxExtensions = wx.TextCtrl(self.panel)
+        self.textboxFolderPath.Value = baseData["destinationPath"]
+        self.textboxExtensions.Value = " ".join(baseData["extensions"])
 
         '''Buttons'''
         self.btnBrowseFolder = wx.Button(self.panel, label="Browse")
         self.btnBrowseFolder.Bind(wx.EVT_BUTTON, self.onBtnBrowse)
         self.btnSave = wx.Button(self.panel, label="Save")
         self.btnSave.Bind(wx.EVT_BUTTON, self.onBtnSave)
+        self.btnCancel = wx.Button(self.panel, label="Back")
+        self.btnCancel.Bind(wx.EVT_BUTTON, self.onBtnCancel)
 
         '''Layout'''
         # Select path
@@ -59,7 +77,9 @@ class AddRuleWindow(wx.Frame):
         self.vbox.Add(self.textboxExtensions, flag=wx.EXPAND|wx.LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM, border=10)
 
         # Save
-        self.vbox.Add(self.btnSave, flag=wx.CENTER|wx.LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM, border=10)
+        self.operationsBox.Add(self.btnCancel, flag=wx.RIGHT|wx.LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM, border=10)
+        self.operationsBox.Add(self.btnSave, flag=wx.RIGHT|wx.LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM, border=10)
+        self.vbox.Add(self.operationsBox, flag=wx.CENTER|wx.LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM, border=10)
 
         self.panel.SetSizer(self.vbox)
         self.Center()
@@ -68,5 +88,6 @@ class AddRuleWindow(wx.Frame):
         self.vbox.Layout()
         self.SetMinSize(self.GetSize())
         self.SetMaxSize(self.GetSize())
+        self.Bind(wx.EVT_CLOSE, self.onClose)
 
         self.Show(True)
