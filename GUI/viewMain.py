@@ -3,7 +3,7 @@ import wx.dataview
 from pubsub import pub
 from Sorter.config import Config
 from Sorter.sorter import Sorter
-from GUI import viewModifyRule,viewRemoveConfirmation
+from GUI import viewModifyRule,viewRemove
 
 class MainWindow(wx.Frame):
 
@@ -25,7 +25,7 @@ class MainWindow(wx.Frame):
     def onBtnRemoveItem(self, event) -> None:
 
         selectedItem = self.dataView.GetSelectedRow()
-        removeRuleWindow = viewRemoveConfirmation.RemoveRule(selectedItem)
+        removeRuleWindow = viewRemove.RemoveRule(selectedItem)
         removeRuleWindow.Show()
 
     def onBtnModifyItem(self, event) -> None:
