@@ -1,7 +1,7 @@
 import wx
 from pubsub import pub
 
-class ModifyRuleWindow(wx.Frame):
+class AddRuleWindow(wx.Frame):
 
     def onBtnBrowse(self, event):
         dlg = wx.DirDialog(self, "Choose a directory:", style=wx.DD_DEFAULT_STYLE)
@@ -19,21 +19,18 @@ class ModifyRuleWindow(wx.Frame):
             for extension in self.textboxExtensions.GetValue().split(" ")
         ]
 
-        data = { 
-            "id": self.id,
+        data = {
             "extensions": extensions, 
             "destinationPath": self.textboxFolderPath.GetValue()
         }
         
-        pub.sendMessage("modifyRuleListener", data=data)
+        pub.sendMessage("addRuleListener", data=data)
 
         self.Destroy()
 
-    def __init__(self, id:int, baseData:dict = {"destinationPath":"","extensions":[]}) -> None:
+    def __init__(self) -> None:
         wx.Frame.__init__(self, None, title="Modify rule", style=wx.DEFAULT_DIALOG_STYLE & ~wx.RESIZE_BORDER)
         self.panel = wx.Panel(self)
-
-        self.id:int = id
 
         '''Sizers'''
         self.vbox = wx.BoxSizer(wx.VERTICAL)
@@ -47,9 +44,6 @@ class ModifyRuleWindow(wx.Frame):
         '''Textboxes'''
         self.textboxFolderPath = wx.TextCtrl(self.panel, size=(300, -1))
         self.textboxExtensions = wx.TextCtrl(self.panel)
-        self.textboxFolderPath.Value = baseData["destinationPath"]
-        self.textboxExtensions.Value = " ".join(baseData["extensions"])
-
         '''Buttons'''
         self.btnBrowseFolder = wx.Button(self.panel, label="Browse")
         self.btnBrowseFolder.Bind(wx.EVT_BUTTON, self.onBtnBrowse)

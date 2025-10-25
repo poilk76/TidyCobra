@@ -30,8 +30,8 @@ class RemoveRule(wx.Frame):
         self.btnConfirm.Bind(wx.EVT_BUTTON, self.onBtnConfirm)
         self.btnCancel = wx.Button(self.panel, label="No")
         self.btnCancel.Bind(wx.EVT_BUTTON, self.onBtnCancel)
-        self.operationsBox.Add(self.btnCancel, flag=wx.RIGHT|wx.LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM, border=10)
         self.operationsBox.Add(self.btnConfirm, flag=wx.RIGHT|wx.LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM, border=10)
+        self.operationsBox.Add(self.btnCancel, flag=wx.RIGHT|wx.LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM, border=10)
         self.vbox.Add(self.operationsBox, flag=wx.CENTER|wx.LEFT|wx.RIGHT|wx.TOP|wx.BOTTOM, border=10)
 
         self.panel.SetSizer(self.vbox)
@@ -41,5 +41,7 @@ class RemoveRule(wx.Frame):
         self.vbox.Layout()
         self.SetMinSize(self.GetSize())
         self.SetMaxSize(self.GetSize())
+
+
 
         self.Show(True)

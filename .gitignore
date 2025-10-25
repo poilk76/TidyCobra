@@ -1,0 +1,20 @@
+# personal files
+config.json
+*/__pycache__
+.env
+
+# IDE files
+.idea/
+*.iml
+out/
+*.sublime-workspace
+*.sublime-project
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vscode/
+.history/
+.venv
+venv
