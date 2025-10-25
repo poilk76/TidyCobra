@@ -1,5 +1,5 @@
 <div align="center">
-<img align="center" src="https://github.com/poilk76/TidyCobra/blob/master/Resources/banner.png">
+<img align="center" src="https://github.com/poilk76/TidyCobra/blob/master/Assets/banner.png">
 </div>
 <br/>
 <p>🐍TidyCobra is a Python-based utility that automates the sorting of your files into designated folders like Pictures, Music, Documents, etc., keeping your folders organized.</p>
