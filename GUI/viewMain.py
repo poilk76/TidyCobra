@@ -151,7 +151,7 @@ class MainWindow(wx.Frame):
         self.textBoxDownloadFolder = wx.TextCtrl(self.panel)
 
         ''' DataView '''
-        self.dataView = wx.dataview.DataViewListCtrl(self.panel, size=(200, 200))
+        self.dataView = wx.dataview.DataViewListCtrl(self.panel, size=(400, 200))
         self.dataView.AppendTextColumn("Folder Path", width=225)
         self.dataView.AppendTextColumn("Extensions")
 
@@ -177,13 +177,10 @@ class MainWindow(wx.Frame):
         self.sizerMain.Add(self.hboxSaveControls, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, border=10)
 
         self.panel.SetSizer(self.sizerMain)
-        self.Center()
-        self.SetSize(self.GetBestSize())
         self.sizerMain.Fit(self)
-        self.SetMinSize(self.GetSize())
-        self.SetMaxSize(self.GetSize())
-        self.Bind(wx.EVT_CLOSE, self.onClose)
         self.Center()
+
+        self.Bind(wx.EVT_CLOSE, self.onClose)
 
         for destinationFolder in self.config.rulesList[0]["destinationFolders"]:
             self.dataView.AppendItem([destinationFolder["destinationPath"]," ".join(destinationFolder["extensions"])])
