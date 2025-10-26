@@ -1,2 +1,2 @@
-Pypubsub >= 4.0.3
-wxPython >= 4.2.3
+Pypubsub
+wxPython
