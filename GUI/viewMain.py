@@ -95,15 +95,15 @@ class MainWindow(wx.Frame):
         
     
     def __init__(self) -> None:
-        wx.Frame.__init__(self, None, title="Tidy Cobra", style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER
-                                                                                           | wx.MAXIMIZE_BOX))
+        wx.Frame.__init__(self, None, title="Tidy Cobra", style=wx.DEFAULT_FRAME_STYLE)
+
+        self.SetMinSize((200,300))
         
         self.config = Config()
         self.sorter = Sorter(self.config)
         self.isIntervalRunning:bool = False
 
         self.payload = []
-        self.SetMinSize(self.GetSize())
         self.panel = wx.Panel(self)
         self.CreateStatusBar()
         self.SetStatusText("Ready!")
@@ -164,7 +164,7 @@ class MainWindow(wx.Frame):
 
         ''' Step 2: Set up rules '''
         self.sizerMain.Add(self.textStep2, wx.SizerFlags().Border(wx.TOP | wx.LEFT, 10))
-        self.sizerMain.Add(self.dataView, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP | wx.BOTTOM, border=10)
+        self.sizerMain.Add(self.dataView, proportion=1, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP | wx.BOTTOM, border=10)
         self.hboxDataViewControls.Add(self.btnAddItem, wx.SizerFlags().Border(wx.RIGHT, 2).Proportion(1))
         self.hboxDataViewControls.Add(self.btnRemoveItem, wx.SizerFlags().Proportion(1).Border(wx.LEFT | wx.RIGHT, 2))
         self.hboxDataViewControls.Add(self.btnImportConfig, wx.SizerFlags().Proportion(1).Border(wx.LEFT, 2))
