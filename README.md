@@ -11,6 +11,11 @@
 - **Automatic Sorting**: Redirect files to specific folders based on file type.
 - **Custom Rules**: Configure your own sorting criteria.
 
+## Works on:
+
+- Linux
+- Windows
+
 ## Requirements
 
 - Python 3.x
