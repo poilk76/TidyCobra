@@ -29,7 +29,7 @@ class AddRuleWindow(wx.Frame):
         self.Destroy()
 
     def __init__(self) -> None:
-        wx.Frame.__init__(self, None, title="Modify rule", style=wx.DEFAULT_DIALOG_STYLE & ~wx.RESIZE_BORDER)
+        wx.Frame.__init__(self, None, title="Add rule", style=wx.DEFAULT_DIALOG_STYLE & ~wx.RESIZE_BORDER)
         self.panel = wx.Panel(self)
 
         '''Sizers'''
