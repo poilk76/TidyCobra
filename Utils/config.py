@@ -6,19 +6,30 @@ configTemplate: dict = {
     "isIntervalRunning": False,
     "interval": 15000,
     "rulesList": [
-        #  {
-        #      "sourceFolder": "<path to source folder>",
-        #      "destinationFolders": [
-        #           {
-        #               "extensions": [<file extensions like .pdf, .png, ...>],
-        #               "destinationPath": "<path where file should go>"
-        #           },
-        #           ...
-        #      ]
-        #  }, ...
         {
-            "sourceFolder": "",
-            "destinationFolders": []
+            "sourceFolder": path.join(path.expanduser("~"), "Downloads"),
+            "destinationFolders": [
+                {
+                    "extensions": [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"],
+                    "destinationPath": path.join(path.expanduser("~"), "Pictures")
+                },
+                {
+                    "extensions": [".pdf", ".doc", ".docx", ".txt", ".xls", ".xlsx", ".ppt", ".pptx", ".csv"],
+                    "destinationPath": path.join(path.expanduser("~"), "Documents")
+                },
+                {
+                    "extensions": [".mp3", ".wav", ".flac", ".aac"],
+                    "destinationPath": path.join(path.expanduser("~"), "Music")
+                },
+                {
+                    "extensions": [".mp4", ".mkv", ".avi", ".mov", ".webm"],
+                    "destinationPath": path.join(path.expanduser("~"), "Videos")
+                },
+                {
+                    "extensions": [".zip", ".rar", ".7z", ".tar", ".gz"],
+                    "destinationPath": path.join(path.expanduser("~"), "Documents")
+                }
+            ]
         }
     ]
 }
