@@ -50,13 +50,15 @@ class MainWindow(wx.Frame):
         
         if self.config.isIntervalRunning:
             self.config.isIntervalRunning = False
-            self.btnInterval.Label = "Start Interval"
+            if hasattr(self, "timer"):
+                self.timer.Stop()
         else:
             self.timer = wx.Timer(self)
             self.Bind(wx.EVT_TIMER, self.onInterval, self.timer)
             self.timer.Start(self.config.interval)
             self.config.isIntervalRunning = True
-            self.btnInterval.Label = "Stop Interval"
+        
+        self.updateStatusLabel()
 
     def onBtnLoadConfig(self,event) -> None:
         dlg = wx.FileDialog(self, "Choose a file:", style=wx.DD_DEFAULT_STYLE)
@@ -105,7 +107,20 @@ class MainWindow(wx.Frame):
 
         self.SetStatusText(f'Item number {id} has been removed.')
 
+    def updateStatusLabel(self) -> None:
+        if self.config.isIntervalRunning:
+            self.lblStatus.SetLabel("Background: ON")
+            self.lblStatus.SetForegroundColour(wx.Colour(0, 150, 0))
+        else:
+            self.lblStatus.SetLabel("Background: OFF")
+            self.lblStatus.SetForegroundColour(wx.Colour(200, 0, 0))
+        self.lblStatus.Refresh()
+
     def render(self) -> None:
+
+        self.panel.DestroyChildren()
+        if hasattr(self, "timer"):
+            self.timer.Stop()
 
         ''' Text labels '''
         self.textStep1 = wx.StaticText(self.panel, label="Step 1: Choose your Downloads folder")
@@ -140,12 +155,11 @@ class MainWindow(wx.Frame):
             self.timer = wx.Timer(self)
             self.Bind(wx.EVT_TIMER, self.onInterval, self.timer)
             self.timer.Start(self.config.interval)
-            self.btnInterval = wx.Button(self.panel, label="Stop Interval")
-        else:
-            self.btnInterval = wx.Button(self.panel, label="Stop Interval")
+
+        self.btnInterval = wx.Button(self.panel, label="Toggle Background")
         self.btnInterval.Bind(wx.EVT_BUTTON, self.onBtnStartInterval)
 
-        self.btnRunManual = wx.Button(self.panel, label="Run Sorter")
+        self.btnRunManual = wx.Button(self.panel, label="Run once")
         self.btnRunManual.Bind(wx.EVT_BUTTON, self.onBtnRunManual)
 
         self.btnLoadConfig = wx.Button(self.panel, label="Load Config")
@@ -178,7 +192,16 @@ class MainWindow(wx.Frame):
         self.sizerMain.Add(self.hboxDataViewControls, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, border=10)
 
         ''' Step 3: Save/Run '''
-        self.sizerMain.Add(self.textStep3, wx.SizerFlags().Border(wx.TOP | wx.LEFT | wx.BOTTOM, 10))
+        self.hboxStep3 = wx.BoxSizer(wx.HORIZONTAL)
+        self.hboxStep3.Add(self.textStep3, flag=wx.ALIGN_CENTER_VERTICAL)
+        self.hboxStep3.AddStretchSpacer(1)
+        self.lblStatus = wx.StaticText(self.panel, label="")
+        font = self.lblStatus.GetFont()
+        font.MakeBold()
+        self.lblStatus.SetFont(font)
+        self.hboxStep3.Add(self.lblStatus, flag=wx.ALIGN_CENTER_VERTICAL)
+        self.sizerMain.Add(self.hboxStep3, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT | wx.BOTTOM, border=10)
+
         self.hboxSaveControls.Add(self.btnInterval, wx.SizerFlags().Border(wx.RIGHT, 2).Proportion(1))
         self.hboxSaveControls.Add(self.btnRunManual, wx.SizerFlags().Proportion(1).Border(wx.LEFT | wx.RIGHT, 2))
         self.hboxSaveControls.Add(self.btnLoadConfig, wx.SizerFlags().Proportion(1).Border(wx.LEFT, 2))
@@ -186,10 +209,9 @@ class MainWindow(wx.Frame):
 
         self.panel.SetSizer(self.sizerMain)
         self.sizerMain.Fit(self)
+        self.updateStatusLabel()
         self.Center()
 
-        self.Bind(wx.EVT_CLOSE, self.onClose)
-    
     def __init__(self) -> None:
         wx.Frame.__init__(self, None, title="Tidy Cobra", style=wx.DEFAULT_FRAME_STYLE)
 
@@ -204,6 +226,7 @@ class MainWindow(wx.Frame):
 
         self.panel = wx.Panel(self)
         self.CreateStatusBar()
+        self.Bind(wx.EVT_CLOSE, self.onClose)
         self.SetStatusText("Ready!")
         
         self.render()
