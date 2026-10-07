@@ -2,6 +2,7 @@ from json import load, dump
 from os import path
 
 configTemplate: dict = {
+    "version": "0.0.1",
     "startup": False,
     "isIntervalRunning": False,
     "interval": 15000,
