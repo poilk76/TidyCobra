@@ -49,22 +49,10 @@ class RuleWindow(wx.Frame):
         
         if self.config.rulesList[self.id]["isIntervalRunning"]:
             self.config.rulesList[self.id]["isIntervalRunning"] = False
-            if hasattr(self, "timer"):
-                self.timer.Stop()
         else:
-            self.timer = wx.Timer(self)
-            self.Bind(wx.EVT_TIMER, self.onInterval, self.timer)
-            self.timer.Start(self.config.interval)
             self.config.rulesList[self.id]["isIntervalRunning"] = True
         
         self.updateStatusLabel()
-
-    def onInterval(self,event) -> None:
-
-        self.sorter.ruleList = self.config.rulesList
-        result = self.sorter.sortAll()
-
-        self.SetStatusText(f'Interval: s:{result["successCount"]} f:{result["failCount"]} {result["message"]}')
 
     def onBtnSave(self,event) -> None:
 
@@ -106,8 +94,6 @@ class RuleWindow(wx.Frame):
     def render(self) -> None:
 
         self.panel.DestroyChildren()
-        if hasattr(self, "timer"):
-            self.timer.Stop()
 
         ''' Text labels '''
         self.textStep1 = wx.StaticText(self.panel, label="Step 1: Choose your Downloads folder")
@@ -137,11 +123,6 @@ class RuleWindow(wx.Frame):
 
         self.btnModifyItem = wx.Button(self.panel, label="Modify")
         self.btnModifyItem.Bind(wx.EVT_BUTTON, self.onBtnModifyItem)
-
-        if self.config.rulesList[self.id]["isIntervalRunning"]:
-            self.timer = wx.Timer(self)
-            self.Bind(wx.EVT_TIMER, self.onInterval, self.timer)
-            self.timer.Start(self.config.interval)
 
         self.btnSave = wx.Button(self.panel, label="Save")
         self.btnSave.Bind(wx.EVT_BUTTON, self.onBtnSave)

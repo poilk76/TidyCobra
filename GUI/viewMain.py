@@ -2,6 +2,7 @@ import wx
 import wx.dataview
 from pubsub import pub
 from Utils.config import Config
+from Utils.sorter import Sorter
 from GUI import viewRemove, viewRule
 
 class MainWindow(wx.Frame):
@@ -41,6 +42,12 @@ class MainWindow(wx.Frame):
         self.config.saveConfig()
         viewRule.renderGui(l)
 
+    def onInterval(self,event):
+
+        self.sorter.ruleList = self.config.rulesList
+        result = self.sorter.sortAll()
+
+        self.SetStatusText(f'Interval: s:{result["successCount"]} f:{result["failCount"]} {result["message"]}')
 
     def reRender(self):
         
@@ -49,7 +56,9 @@ class MainWindow(wx.Frame):
     def render(self) -> None:
 
         self.panel.DestroyChildren()
+
         self.config = Config()
+        self.sorter = Sorter(self.config)
 
         # Dividers
         self.sizerMain = wx.BoxSizer(wx.VERTICAL)
@@ -93,8 +102,6 @@ class MainWindow(wx.Frame):
         wx.Frame.__init__(self, None, title="Tidy Cobra", style=wx.DEFAULT_FRAME_STYLE)
 
         self.SetMinSize((200,300))
-        
-        self.config = Config()
 
         pub.subscribe(self.listenerRemoveFolder, "removeFolderListener")
         pub.subscribe(self.reRender, "reRender")
@@ -104,6 +111,10 @@ class MainWindow(wx.Frame):
         self.SetStatusText("Ready!")
         
         self.render()
+
+        self.timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.onInterval, self.timer)
+        self.timer.Start(self.config.interval)
         
         self.Show(True)
 
