@@ -26,7 +26,7 @@ class RemoveRule(wx.Frame):
         self.operationsBox = wx.BoxSizer(wx.HORIZONTAL)
 
         '''Labels'''
-        self.message= wx.StaticText(self.panel, label="Are you sure you want to delete this role?")
+        self.message= wx.StaticText(self.panel, label=f"Are you sure you want to delete this {"folder" if self.folder else "rule"}?")
         self.vbox.Add(self.message, flag=wx.LEFT|wx.RIGHT|wx.TOP, border=10)
 
         '''Buttons'''
