@@ -42,6 +42,7 @@ class Config:
         
         with open(self.configFilePath, 'w') as configFile:
             dump({
+                    "version":"0.0.1",
                     "interval":self.interval,
                     "startup": self.startup,
                     "rulesList": self.rulesList
