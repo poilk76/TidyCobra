@@ -161,9 +161,6 @@ class MainWindow(wx.Frame):
 
         self.btnRunManual = wx.Button(self.panel, label="Run once")
         self.btnRunManual.Bind(wx.EVT_BUTTON, self.onBtnRunManual)
-
-        self.btnLoadConfig = wx.Button(self.panel, label="Load Config")
-        self.btnLoadConfig.Bind(wx.EVT_BUTTON, self.onBtnLoadConfig)
         
         ''' Textboxes '''
         self.textBoxDownloadFolder = wx.TextCtrl(self.panel)
@@ -204,7 +201,6 @@ class MainWindow(wx.Frame):
 
         self.hboxSaveControls.Add(self.btnInterval, wx.SizerFlags().Border(wx.RIGHT, 2).Proportion(1))
         self.hboxSaveControls.Add(self.btnRunManual, wx.SizerFlags().Proportion(1).Border(wx.LEFT | wx.RIGHT, 2))
-        self.hboxSaveControls.Add(self.btnLoadConfig, wx.SizerFlags().Proportion(1).Border(wx.LEFT, 2))
         self.sizerMain.Add(self.hboxSaveControls, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, border=10)
 
         self.panel.SetSizer(self.sizerMain)
