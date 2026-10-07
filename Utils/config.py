@@ -4,7 +4,6 @@ from os import path
 configTemplate: dict = {
     "version": "0.0.1",
     "startup": False,
-    "isIntervalRunning": False,
     "interval": 15000,
     "rulesList": [
         {
@@ -30,7 +29,8 @@ configTemplate: dict = {
                     "extensions": [".zip", ".rar", ".7z", ".tar", ".gz"],
                     "destinationPath": path.join(path.expanduser("~"), "Documents")
                 }
-            ]
+            ],
+            "isIntervalRunning": False
         }
     ]
 }
@@ -42,7 +42,6 @@ class Config:
         
         with open(self.configFilePath, 'w') as configFile:
             dump({
-                    "isIntervalRunning": self.isIntervalRunning,
                     "interval":self.interval,
                     "startup": self.startup,
                     "rulesList": self.rulesList
@@ -68,11 +67,17 @@ class Config:
                             "extensions": rule[1].split(" ")
                         }
                         for rule in dummy["rules"]
-                    ]
+                    ],
+                    "isIntervalRunning": False
                 }
             ]
+        elif not "version" in dummy:
+            # support for before versioning
+            self.interval: int = dummy["interval"]
+            self.startup: bool = dummy["startup"]
+            self.rulesList: list = dummy["rulesList"]
+            for rule in self.rulesList: rule["isIntervalRunning"] = False
         else:
-            self.isIntervalRunning: bool = dummy["isIntervalRunning"]
             self.interval: int = dummy["interval"]
             self.startup: bool = dummy["startup"]
             self.rulesList: list = dummy["rulesList"]

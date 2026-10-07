@@ -48,15 +48,15 @@ class MainWindow(wx.Frame):
 
     def onBtnStartInterval(self,event) -> None:
         
-        if self.config.isIntervalRunning:
-            self.config.isIntervalRunning = False
+        if self.config.rulesList[0]["isIntervalRunning"]:
+            self.config.rulesList[0]["isIntervalRunning"] = False
             if hasattr(self, "timer"):
                 self.timer.Stop()
         else:
             self.timer = wx.Timer(self)
             self.Bind(wx.EVT_TIMER, self.onInterval, self.timer)
             self.timer.Start(self.config.interval)
-            self.config.isIntervalRunning = True
+            self.config.rulesList[0]["isIntervalRunning"] = True
         
         self.updateStatusLabel()
 
@@ -108,7 +108,7 @@ class MainWindow(wx.Frame):
         self.SetStatusText(f'Item number {id} has been removed.')
 
     def updateStatusLabel(self) -> None:
-        if self.config.isIntervalRunning:
+        if self.config.rulesList[0]["isIntervalRunning"]:
             self.lblStatus.SetLabel("Background: ON")
             self.lblStatus.SetForegroundColour(wx.Colour(0, 150, 0))
         else:
@@ -151,7 +151,7 @@ class MainWindow(wx.Frame):
         self.btnModifyItem = wx.Button(self.panel, label="Modify")
         self.btnModifyItem.Bind(wx.EVT_BUTTON, self.onBtnModifyItem)
 
-        if self.config.isIntervalRunning:
+        if self.config.rulesList[0]["isIntervalRunning"]:
             self.timer = wx.Timer(self)
             self.Bind(wx.EVT_TIMER, self.onInterval, self.timer)
             self.timer.Start(self.config.interval)
