@@ -23,7 +23,6 @@ class RuleWindow(wx.Frame):
     def onBtnRemoveItem(self, event) -> None:
 
         selectedItem:int = self.dataView.GetSelectedRow()
-        selectedItem:int = self.dataView.GetSelectedRow()
         if 0 <= selectedItem <= len(self.config.rulesList[0]["destinationFolders"]):
             removeRuleWindow = viewRemove.RemoveRule(selectedItem)
             removeRuleWindow.Show()
