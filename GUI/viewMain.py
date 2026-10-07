@@ -30,6 +30,18 @@ class MainWindow(wx.Frame):
         else:
             self.SetStatusText("No selected item.")
 
+    def onBtnAddItem(self,event):
+
+        l = len(self.config.rulesList)
+        self.config.rulesList.append({
+            "sourceFolder":"",
+            "destinationFolders": [],
+            "isIntervalRunning":False
+        })
+        self.config.saveConfig()
+        viewRule.renderGui(l)
+
+
     def reRender(self):
         
         self.render()
@@ -55,6 +67,7 @@ class MainWindow(wx.Frame):
             
         # Modify
         self.btnAddItem = wx.Button(self.panel,label="Add")
+        self.btnAddItem.Bind(wx.EVT_BUTTON, self.onBtnAddItem)
         self.btnRemoveItem = wx.Button(self.panel, label="Remove")
         self.btnRemoveItem.Bind(wx.EVT_BUTTON, self.onBtnRemoveItem)
         self.btnModifyItem = wx.Button(self.panel,label="Modify")
