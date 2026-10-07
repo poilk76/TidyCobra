@@ -12,7 +12,7 @@ class RuleWindow(wx.Frame):
         dlg = wx.DirDialog(self, "Choose a directory:", style=wx.DD_DEFAULT_STYLE)
         if dlg.ShowModal() == wx.ID_OK:
             self.textBoxDownloadFolder.SetValue(dlg.GetPath())
-            self.config.rulesList[0]["sourceFolder"] = dlg.GetPath()
+            self.config.rulesList[self.id]["sourceFolder"] = dlg.GetPath()
         dlg.Destroy()
 
     def onBtnAddItem(self, event) -> None:
@@ -23,7 +23,7 @@ class RuleWindow(wx.Frame):
     def onBtnRemoveItem(self, event) -> None:
 
         selectedItem:int = self.dataView.GetSelectedRow()
-        if 0 <= selectedItem <= len(self.config.rulesList[0]["destinationFolders"]):
+        if 0 <= selectedItem <= len(self.config.rulesList[self.id]["destinationFolders"]):
             removeRuleWindow = viewRemove.RemoveRule(selectedItem)
             removeRuleWindow.Show()
         else:
@@ -32,8 +32,8 @@ class RuleWindow(wx.Frame):
     def onBtnModifyItem(self, event) -> None:
         
         selectedItem:int = self.dataView.GetSelectedRow()
-        if 0 <= selectedItem <= len(self.config.rulesList[0]["destinationFolders"]):
-            modifyRuleWindow = viewModifyRule.ModifyRuleWindow(selectedItem,self.config.rulesList[0]["destinationFolders"][selectedItem])
+        if 0 <= selectedItem <= len(self.config.rulesList[self.id]["destinationFolders"]):
+            modifyRuleWindow = viewModifyRule.ModifyRuleWindow(selectedItem,self.config.rulesList[self.id]["destinationFolders"][selectedItem])
             modifyRuleWindow.Show()
         else:
             self.SetStatusText("No selected item.")
@@ -47,30 +47,17 @@ class RuleWindow(wx.Frame):
 
     def onBtnStartInterval(self,event) -> None:
         
-        if self.config.rulesList[0]["isIntervalRunning"]:
-            self.config.rulesList[0]["isIntervalRunning"] = False
+        if self.config.rulesList[self.id]["isIntervalRunning"]:
+            self.config.rulesList[self.id]["isIntervalRunning"] = False
             if hasattr(self, "timer"):
                 self.timer.Stop()
         else:
             self.timer = wx.Timer(self)
             self.Bind(wx.EVT_TIMER, self.onInterval, self.timer)
             self.timer.Start(self.config.interval)
-            self.config.rulesList[0]["isIntervalRunning"] = True
+            self.config.rulesList[self.id]["isIntervalRunning"] = True
         
         self.updateStatusLabel()
-
-    def onBtnLoadConfig(self,event) -> None:
-        dlg = wx.FileDialog(self, "Choose a file:", style=wx.DD_DEFAULT_STYLE)
-        if dlg.ShowModal() == wx.ID_OK:
-            filePath = dlg.GetPath()
-            try:
-                self.config.loadConfig(filePath)
-                self.SetStatusText(f"{filePath} config file loaded.")
-            except:
-                self.SetStatusText(f"Failed to load config.")
-            self.render()
-        else:
-            self.SetStatusText(f"Failed to load config.")
 
     def onInterval(self,event) -> None:
 
@@ -79,15 +66,16 @@ class RuleWindow(wx.Frame):
 
         self.SetStatusText(f'Interval: s:{result["successCount"]} f:{result["failCount"]} {result["message"]}')
 
-    def onClose(self,event) -> None:
+    def onBtnSave(self,event) -> None:
 
         self.config.saveConfig()
+        pub.sendMessage("reRender")
         self.Destroy()
 
     def listenerAddRule(self, data) -> None:
 
         self.dataView.AppendItem([data["destinationPath"]," ".join(data["extensions"])])
-        self.config.rulesList[0]["destinationFolders"].append(data)
+        self.config.rulesList[self.id]["destinationFolders"].append(data)
 
         self.SetStatusText('New element has been added.')
 
@@ -95,19 +83,19 @@ class RuleWindow(wx.Frame):
  
         self.dataView.SetValue(data["destinationPath"],data["id"],0)
         self.dataView.SetValue(" ".join(data["extensions"]),data["id"],1)
-        self.config.rulesList[0]["destinationFolders"][data["id"]] = data
+        self.config.rulesList[self.id]["destinationFolders"][data["id"]] = data
 
         self.SetStatusText(f'Item number {data['id']} has been changed.')
 
     def listenerRemoveRule(self, id) -> None:
 
         self.dataView.DeleteItem(id)
-        self.config.rulesList[0]["destinationFolders"].pop(id)
+        self.config.rulesList[self.id]["destinationFolders"].pop(id)
 
         self.SetStatusText(f'Item number {id} has been removed.')
 
     def updateStatusLabel(self) -> None:
-        if self.config.rulesList[0]["isIntervalRunning"]:
+        if self.config.rulesList[self.id]["isIntervalRunning"]:
             self.lblStatus.SetLabel("Background: ON")
             self.lblStatus.SetForegroundColour(wx.Colour(0, 150, 0))
         else:
@@ -150,10 +138,13 @@ class RuleWindow(wx.Frame):
         self.btnModifyItem = wx.Button(self.panel, label="Modify")
         self.btnModifyItem.Bind(wx.EVT_BUTTON, self.onBtnModifyItem)
 
-        if self.config.rulesList[0]["isIntervalRunning"]:
+        if self.config.rulesList[self.id]["isIntervalRunning"]:
             self.timer = wx.Timer(self)
             self.Bind(wx.EVT_TIMER, self.onInterval, self.timer)
             self.timer.Start(self.config.interval)
+
+        self.btnSave = wx.Button(self.panel, label="Save")
+        self.btnSave.Bind(wx.EVT_BUTTON, self.onBtnSave)
 
         self.btnInterval = wx.Button(self.panel, label="Toggle Background")
         self.btnInterval.Bind(wx.EVT_BUTTON, self.onBtnStartInterval)
@@ -163,13 +154,13 @@ class RuleWindow(wx.Frame):
         
         ''' Textboxes '''
         self.textBoxDownloadFolder = wx.TextCtrl(self.panel)
-        self.textBoxDownloadFolder.SetValue(self.config.rulesList[0]["sourceFolder"])
+        self.textBoxDownloadFolder.SetValue(self.config.rulesList[self.id]["sourceFolder"])
 
         ''' DataView '''
         self.dataView = wx.dataview.DataViewListCtrl(self.panel, size=(400, 200))
         self.dataView.AppendTextColumn("Folder Path", width=225)
         self.dataView.AppendTextColumn("Extensions")
-        for destinationFolder in self.config.rulesList[0]["destinationFolders"]:
+        for destinationFolder in self.config.rulesList[self.id]["destinationFolders"]:
             self.dataView.AppendItem([destinationFolder["destinationPath"]," ".join(destinationFolder["extensions"])])
 
         ''' Step 1 : Select download folder'''
@@ -198,8 +189,9 @@ class RuleWindow(wx.Frame):
         self.hboxStep3.Add(self.lblStatus, flag=wx.ALIGN_CENTER_VERTICAL)
         self.sizerMain.Add(self.hboxStep3, flag=wx.EXPAND | wx.TOP | wx.LEFT | wx.RIGHT | wx.BOTTOM, border=10)
 
-        self.hboxSaveControls.Add(self.btnInterval, wx.SizerFlags().Border(wx.RIGHT, 2).Proportion(1))
-        self.hboxSaveControls.Add(self.btnRunManual, wx.SizerFlags().Proportion(1).Border(wx.LEFT | wx.RIGHT, 2))
+        self.hboxSaveControls.Add(self.btnSave, wx.SizerFlags().Border(wx.RIGHT, 2).Proportion(1))
+        self.hboxSaveControls.Add(self.btnInterval, wx.SizerFlags().Proportion(1).Border(wx.LEFT | wx.RIGHT, 2))
+        self.hboxSaveControls.Add(self.btnRunManual, wx.SizerFlags().Proportion(1).Border(wx.LEFT, 2))
         self.sizerMain.Add(self.hboxSaveControls, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.BOTTOM, border=10)
 
         self.panel.SetSizer(self.sizerMain)
@@ -207,11 +199,13 @@ class RuleWindow(wx.Frame):
         self.updateStatusLabel()
         self.Center()
 
-    def __init__(self) -> None:
+    def __init__(self,id:int) -> None:
         wx.Frame.__init__(self, None, title="Tidy Cobra", style=wx.DEFAULT_FRAME_STYLE)
 
         self.SetMinSize((200,300))
         
+        self.id = id
+
         self.config = Config()
         self.sorter = Sorter(self.config)
 
@@ -221,16 +215,15 @@ class RuleWindow(wx.Frame):
 
         self.panel = wx.Panel(self)
         self.CreateStatusBar()
-        self.Bind(wx.EVT_CLOSE, self.onClose)
         self.SetStatusText("Ready!")
         
         self.render()
         
         self.Show(True)
 
-def renderGui():
+def renderGui(id):
     app = wx.App()
-    frame = RuleWindow()
+    frame = RuleWindow(id)
     app.MainLoop()
 
 if __name__ == "__main__":
