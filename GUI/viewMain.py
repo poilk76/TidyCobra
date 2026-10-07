@@ -7,6 +7,22 @@ from GUI import viewModifyRule,viewRemove,viewAddRule
 
 class MainWindow(wx.Frame):
 
+    def onBtnRemoveItem(self,event):
+
+        selectedItem:int = self.dataView.GetSelectedRow()
+        if 0 <= selectedItem <= len(self.config.rulesList):
+            removeRuleWindow = viewRemove.RemoveRule(selectedItem,True)
+            removeRuleWindow.Show()
+        else:
+            self.SetStatusText("No selected item.")
+
+    def listenerRemoveFolder(self, id) -> None:
+
+        self.dataView.DeleteItem(id)
+        self.config.rulesList.pop(id)
+
+        self.SetStatusText(f'Item number {id} has been removed.')
+
     def render(self) -> None:
 
         self.panel.DestroyChildren()
@@ -26,8 +42,9 @@ class MainWindow(wx.Frame):
             self.dataView.AppendItem([rule['sourceFolder'],"yes" if rule['isIntervalRunning'] else 'no'])
             
         # Modify
-        self.btnRemoveItem = wx.Button(self.panel, label="Remove")
         self.btnAddItem = wx.Button(self.panel,label="Add")
+        self.btnRemoveItem = wx.Button(self.panel, label="Remove")
+        self.btnRemoveItem.Bind(wx.EVT_BUTTON, self.onBtnRemoveItem)
         self.btnModifyItem = wx.Button(self.panel,label="Modify")
 
         # Settings
@@ -52,6 +69,8 @@ class MainWindow(wx.Frame):
         self.SetMinSize((200,300))
         
         self.config = Config()
+
+        pub.subscribe(self.listenerRemoveFolder, "removeFolderListener")
 
         self.panel = wx.Panel(self)
         self.CreateStatusBar()
