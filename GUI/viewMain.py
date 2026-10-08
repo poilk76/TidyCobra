@@ -20,6 +20,7 @@ class MainWindow(wx.Frame):
 
         self.dataView.DeleteItem(id)
         self.config.rulesList.pop(id)
+        self.config.saveConfig()
 
         self.SetStatusText(f'Item number {id} has been removed.')
 
