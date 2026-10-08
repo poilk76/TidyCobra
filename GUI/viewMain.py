@@ -3,9 +3,13 @@ import wx.dataview
 from pubsub import pub
 from Utils.config import Config
 from Utils.sorter import Sorter
-from GUI import viewRemove, viewRule
+from GUI import viewRemove, viewRule, viewSettings
 
 class MainWindow(wx.Frame):
+
+    def onBtnSettings(self,event):
+
+        viewSettings.renderGui()
 
     def onBtnRemoveItem(self,event):
 
@@ -81,6 +85,7 @@ class MainWindow(wx.Frame):
 
         # Settings
         self.btnSettings = wx.Button(self.panel,label="Settings")
+        self.btnSettings.Bind(wx.EVT_BUTTON,self.onBtnSettings)
 
         self.sizerModify.Add(self.btnAddItem, wx.SizerFlags().Border(wx.RIGHT, 2).Proportion(1))
         self.sizerModify.Add(self.btnRemoveItem, wx.SizerFlags().Proportion(1).Border(wx.LEFT | wx.RIGHT, 2))
