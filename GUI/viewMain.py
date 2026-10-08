@@ -50,10 +50,6 @@ class MainWindow(wx.Frame):
 
         self.SetStatusText(f'Interval: s:{result["successCount"]} f:{result["failCount"]} {result["message"]}')
 
-    def reRender(self):
-        
-        self.render()
-
     def render(self) -> None:
 
         self.panel.DestroyChildren()
@@ -105,7 +101,7 @@ class MainWindow(wx.Frame):
         self.SetMinSize((200,300))
 
         pub.subscribe(self.listenerRemoveFolder, "removeFolderListener")
-        pub.subscribe(self.reRender, "reRender")
+        pub.subscribe(self.render, "reRender")
 
         self.panel = wx.Panel(self)
         self.CreateStatusBar()
