@@ -4,7 +4,31 @@ from pubsub import pub
 from Utils.config import Config
 from GUI import viewRemove, viewRule
 
+NUMBERS = ["0","1","2","3","4","5","6","7","8","9"]
+
+def removeNotNumber(text):
+    return "".join(n for n in text if n in NUMBERS)
+
 class SettingsWindow(wx.Frame):
+
+    def onBtnCancel(self,event):
+
+        self.Destroy()
+
+    def onBtnSave(self,event):
+
+        self.config.interval = int(self.intervalInput.GetValue()) * 1000
+
+        self.config.saveConfig()
+        self.Destroy()
+
+    def onIntervalChange(self, event):
+        value = removeNotNumber(self.intervalInput.GetValue())
+
+        self.intervalInput.ChangeValue(value)
+        self.intervalInput.SetInsertionPointEnd()
+
+        event.Skip()
 
     def render(self) -> None:
 
@@ -22,10 +46,13 @@ class SettingsWindow(wx.Frame):
         # Interval
         self.intervalText = wx.StaticText(self.panel,label="Interval [s]:")
         self.intervalInput = wx.TextCtrl(self.panel,value=str(self.config.interval//1000))
+        self.intervalInput.Bind(wx.EVT_TEXT, self.onIntervalChange)
 
         # Options
         self.btnSave = wx.Button(self.panel,label="Save")
+        self.btnSave.Bind(wx.EVT_BUTTON,self.onBtnSave)
         self.btnCancel = wx.Button(self.panel,label="Cancel")
+        self.btnCancel.Bind(wx.EVT_BUTTON,self.onBtnCancel)
 
         self.sizerMain.Add(self.title, wx.SizerFlags().Border(wx.TOP | wx.LEFT, 10))
         self.sizerMain.Add(self.intervalText, wx.SizerFlags().Border(wx.TOP | wx.LEFT, 10))
